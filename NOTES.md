@@ -12,7 +12,7 @@
 
 ## Working with AI
 
-All in `ai-logs/` (Claude Code session export).
+All in `ai-logs/claude-code-session.md` (Claude Code session export, timestamps in UTC): spec, implementation, review. Quotes below are searchable there.
 
 1. **Prompt that didn't get what I wanted.** The first spec draft planned Jest tests for the API client and submit logic and its own retry helpers. I narrowed it: tests only for amount logic, all retries via TanStack `retry`, POST ≤ 3 attempts, polling ≤ 60 s, deploy only on my command. The spec was rewritten with those constraints. *(ai-logs: "Spec review" — my reply "1. тести робиш тільки для логіки сум…")*
 2. **AI output that was wrong/risky, and how I found out.** (a) The confirm step formatted the raw input, so `0,5` crashed big.js — found during manual testing in the browser. (b) The form blocked itself during submit because in-flight and unknown claims looked the same. (c) `/code-review` found that the Idempotency-Key was generated per tap (double tap → two claims), that a completed claim was still added to `claiming` (Total USD jump), and that the poll window was per screen mount, not per claim — all fixed and re-verified (double click → exactly one claim). Also the AI's own expected value in a totals test was wrong arithmetic — the test run caught it. *(ai-logs: "manual check", "code review")*
