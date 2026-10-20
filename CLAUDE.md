@@ -14,16 +14,14 @@ Expo (React Native, TypeScript) app, delivered as a **web build** opened on a ph
 
 ## Secrets
 
-- API token lives only in `.env` as `EXPO_PUBLIC_API_TOKEN`. `.env` is git-ignored; `.env.example` is committed.
-- Never print, echo or paste the token value into chat, logs, code or commits.
-- Known trade-off: `EXPO_PUBLIC_*` is inlined into the web bundle. Document it in README, don't hide it.
+- The API token is not in code, repo, env files or the deployed build. The user enters it in the app on first open, it is kept in browser storage (localStorage) and can be changed from the UI.
+- API base URL lives in one place: `src/api/config.ts`.
 
 ## Web target
 
 - Every library must work on web (`react-native-web`). Check before adding; no native-only modules.
 - Design for a phone viewport (~375px) first; must not break on desktop width.
 - Platform differences go behind `Platform.OS` or `.web.tsx` files, never scattered.
-- If the API is blocked by CORS, stop and report it — don't add a proxy hack.
 
 ## Structure
 
