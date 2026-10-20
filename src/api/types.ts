@@ -58,3 +58,21 @@ export type ApiErrorCode =
 export interface ApiErrorBody {
   error: { code: string; message: string; field?: string; retryAfterMs?: number };
 }
+
+export type ActivityType = "accrual" | "reversal" | "claim";
+
+export interface ActivityItem {
+  id: string;
+  type: ActivityType;
+  asset: string;
+  amount: string;
+  status: string;
+  exchange: string | null;
+  createdAt: string;
+  relatedId: string | null;
+}
+
+export interface ActivityPage {
+  items: ActivityItem[];
+  nextCursor: string | null;
+}

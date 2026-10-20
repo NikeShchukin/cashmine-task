@@ -11,7 +11,7 @@ import { colors, font, spacing } from "@/theme";
 import { useHome } from "./useHome";
 
 export function HomeScreen() {
-  const { isLoading, error, hasData, isRefreshing, refresh, asOf, items, totals, banner, openClaim, changeToken } =
+  const { isLoading, error, hasData, isRefreshing, refresh, asOf, items, totals, banner, openClaim, openActivity, changeToken } =
     useHome();
 
   if (isLoading) return <Loader />;
@@ -37,6 +37,9 @@ export function HomeScreen() {
         ) : (
           items.map((item) => <BalanceRow key={item.asset} item={item} onPress={() => openClaim(item.asset)} />)
         )}
+        <Pressable accessibilityRole="button" onPress={openActivity}>
+          <Text style={styles.link}>Activity</Text>
+        </Pressable>
         <Pressable accessibilityRole="button" onPress={changeToken}>
           <Text style={styles.link}>Change token</Text>
         </Pressable>

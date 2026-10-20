@@ -18,6 +18,7 @@ export function TokenScreen() {
           value={value}
           onChangeText={setValue}
           placeholder="Paste your token"
+          placeholderTextColor={colors.muted}
           autoCapitalize="none"
           autoCorrect={false}
           secureTextEntry

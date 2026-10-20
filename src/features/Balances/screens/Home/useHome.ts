@@ -51,6 +51,7 @@ export function useHome() {
     totals: totals(items),
     banner,
     openClaim: (asset: string) => router.push({ pathname: "/claim/[asset]", params: { asset } }),
+    openActivity: () => router.push("/activity"),
     changeToken: () => router.push("/token"),
   };
 }

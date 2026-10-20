@@ -144,3 +144,43 @@ Assumed (my calls, override if you disagree):
 | 9 | Claim form + confirm step + submit mutation (key, retry, outcome) | `src/app/claim/[asset].tsx`, `src/features/Claim/screens/ClaimForm/{index.tsx,useClaimForm.ts}` | AC-019–AC-024 |
 | 10 | Claim status screen (polling ≤ 60 s, unknown + Check) | `src/app/claim-status/[key].tsx`, `src/features/Claim/screens/ClaimStatus/{index.tsx,useClaimStatus.ts}` | AC-025, AC-026 |
 | 11 | Checks, README, NOTES, redeploy (on user's command), AC walk | `README.md`, `NOTES.md` | AC-029, AC-032, AC-033 |
+
+---
+
+# Spec #2 — Activity
+
+Status: **approved 2026-10-20**.
+
+## Goal
+
+The user sees a paginated history of accruals, reversals and claims, newest first.
+
+## Acceptance criteria
+
+- **AC-034 [manual]** Home has an "Activity" link that opens the Activity screen (`/activity`).
+- **AC-035 [manual]** Each row shows: type (Accrual / Reversal / Claim), asset, signed amount (`+9.81`, `-0.5`), status, exchange (when not null), and local date/time.
+- **AC-036 [auto]** `formatSignedAmount` adds `+` to positive amounts, keeps `-` on negative ones, and never rounds or uses exponent notation.
+- **AC-037 [static]** Pagination uses TanStack `useInfiniteQuery`: `limit=20`, `cursor` = previous `nextCursor`; no next page when `nextCursor` is null. Retries via the shared TanStack `retry` / `retryDelay`.
+- **AC-038 [manual]** Scrolling to the end loads the next page with a footer loader; at the last page the footer shows "No more activity".
+- **AC-039 [manual]** States: first load → loader; first-page error → ErrorState + Retry; `items: []` → EmptyState; next-page error → footer message + Retry, loaded rows stay.
+
+## API
+
+`GET /v1/activity?limit=20&cursor=…` → `{ items: [{ id, type, asset, amount, status, exchange, createdAt, relatedId }], nextCursor }`.
+
+## Decisions
+
+- `FlatList` + `onEndReached` (works on react-native-web) instead of a "Load more" button — assumed; footer keeps a Retry for errors.
+- Dates via `toLocaleString()` — no date library.
+- `relatedId` is not shown (no screen to link to in scope).
+
+## Non-goals
+
+Filters, search, linking rows to claim status, pull-to-refresh.
+
+## Plan
+
+| # | Step | Files | ACs |
+|---|---|---|---|
+| 1 | Types, endpoint, `formatSignedAmount` + test | `src/api/types.ts`, `src/api/activity.ts`, `src/utils/amount.ts`, `amount.test.ts` | AC-036, AC-037 |
+| 2 | Activity screen + route + Home link | `src/app/activity.tsx`, `src/features/Activity/screens/Activity/{index.tsx,useActivity.ts}`, Home | AC-034, AC-035, AC-037–AC-039 |

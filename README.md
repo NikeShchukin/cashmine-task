@@ -1,56 +1,33 @@
-# Welcome to your Expo app 👋
+# CashMine payback — Expo web
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+**Live:** https://cashmine-task-three.vercel.app
 
-## Get started
+Open it on a phone, paste your API token, done. The token is kept only in this browser's localStorage and can be changed from Home ("Change token").
 
-1. Install dependencies
-
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **src/app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+## Run locally
 
 ```bash
-npm run reset-project
+npm install
+npx expo start --web
 ```
 
-This command will move the starter code to the **example** directory and create a blank **src/app** directory where you can start developing.
+Checks:
 
-### Other setup steps
+```bash
+npx tsc --noEmit
+npx expo lint
+npm test
+```
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+Build for static hosting: `npx expo export --platform web` → `dist/` (SPA rewrites in `public/vercel.json`).
 
-## Learn more
+## What works
 
-To learn more about developing your project with Expo, look at the following resources:
+- **Token gate** — asked on first open, stored in localStorage, changeable; a 401 sends you back to it.
+- **Balances (Home)** — per-asset available / pending / claiming with USD value, two totals (claimable and total), "Updated Ns ago" from `asOf`, auto-refresh every 15 s + Refresh button, loading / error+retry / empty / refresh-error states.
+- **Claim** — pick an asset, enter an amount or tap Max, see fee and "You receive", confirm, submit. Input is validated against the API rules (format, decimals, min, available, amount > fee). Submits use an Idempotency-Key; network/5xx/504/429 are retried with the same key (max 3 attempts), then the app shows "result unknown" with a safe Check button.
+- **Claim tracking** — status screen polls every 2 s (max 60 s, then Refresh); banner of your claims on Home; balances reflect a new claim immediately and hand over to the server snapshot without jumping.
+- **Activity** — paginated history (accruals, reversals, claims) with infinite scroll.
+- **Tests** — Jest unit tests for amount logic: parsing, validation, fee/receive, totals, the balance overlay, signed formatting.
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Spec with acceptance criteria: [docs/spec.md](docs/spec.md). Decisions and known issues: [NOTES.md](NOTES.md).

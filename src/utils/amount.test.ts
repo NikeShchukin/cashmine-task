@@ -5,6 +5,7 @@ import type { BalancesResponse } from "@/api/types";
 import {
   effectiveBalances,
   formatAmount,
+  formatSignedAmount,
   formatUsd,
   parseAmount,
   totals,
@@ -116,5 +117,14 @@ describe("effectiveBalances", () => {
       { asset: "ETH", amount: "0.5", createdAt: null, status: "unknown" },
     ]);
     expect(eth(res)).toMatchObject({ available: "1.5", claiming: "0.1" });
+  });
+});
+
+describe("formatSignedAmount", () => {
+  it("adds + to positive, keeps - on negative, never rounds", () => {
+    expect(formatSignedAmount("9.81")).toBe("+9.81");
+    expect(formatSignedAmount("-0.5")).toBe("-0.5");
+    expect(formatSignedAmount("-0.000000000000000001")).toBe("-0.000000000000000001");
+    expect(formatSignedAmount("0")).toBe("0");
   });
 });

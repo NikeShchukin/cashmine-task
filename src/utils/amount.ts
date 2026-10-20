@@ -116,3 +116,9 @@ export function effectiveBalances(
     };
   });
 }
+
+/** "+9.81" / "-0.5": sign always shown, never rounded. */
+export function formatSignedAmount(value: string): string {
+  const v = new Big(value);
+  return v.gt(0) ? `+${v.toFixed()}` : v.toFixed();
+}
