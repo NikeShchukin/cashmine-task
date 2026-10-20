@@ -1,4 +1,4 @@
-import Big from "big.js";
+import { Big } from "big.js";
 
 import type { BalanceItem, BalancesResponse } from "@/api/types";
 
@@ -89,27 +89,30 @@ export interface OverlayClaim {
 
 /**
  * The snapshot lags up to 15 s behind a new claim. Until a snapshot taken after the
- * claim's createdAt arrives, move the amount from available to claiming ourselves.
+ * claim's createdAt arrives, apply the claim ourselves: it leaves available at once and
+ * sits in claiming while pending (a completed claim is already paid out).
  */
 export function effectiveBalances(
   snapshot: BalancesResponse,
   claims: OverlayClaim[],
 ): BalanceItem[] {
   const asOf = Date.parse(snapshot.asOf);
+  const sum = (list: OverlayClaim[]) => list.reduce((acc, c) => acc.plus(c.amount), new Big(0));
   return snapshot.items.map((item) => {
-    const inFlight = claims.filter(
+    const notInSnapshot = claims.filter(
       (c) =>
         c.asset === item.asset &&
         c.createdAt !== null &&
         c.status !== "failed" &&
         asOf <= Date.parse(c.createdAt),
     );
-    if (inFlight.length === 0) return item;
-    const sum = inFlight.reduce((acc, c) => acc.plus(c.amount), new Big(0));
+    if (notInSnapshot.length === 0) return item;
     return {
       ...item,
-      available: new Big(item.available).minus(sum).toFixed(),
-      claiming: new Big(item.claiming).plus(sum).toFixed(),
+      available: new Big(item.available).minus(sum(notInSnapshot)).toFixed(),
+      claiming: new Big(item.claiming)
+        .plus(sum(notInSnapshot.filter((c) => c.status === "pending")))
+        .toFixed(),
     };
   });
 }

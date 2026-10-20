@@ -1,4 +1,4 @@
-import Big from "big.js";
+import { Big } from "big.js";
 
 import type { BalancesResponse } from "@/api/types";
 
@@ -98,7 +98,8 @@ describe("effectiveBalances", () => {
       { asset: "ETH", amount: "0.5", createdAt: "2026-10-20T10:00:05.000Z", status: "pending" },
       { asset: "ETH", amount: "0.25", createdAt: "2026-10-20T10:00:06.000Z", status: "completed" },
     ]);
-    expect(eth(res)).toMatchObject({ available: "0.75", claiming: "0.85" });
+    // Both leave available; only the pending one is still claiming.
+    expect(eth(res)).toMatchObject({ available: "0.75", claiming: "0.6" });
     expect(res.find((i) => i.asset === "USDT")).toBe(snapshot.items[0]);
   });
 
